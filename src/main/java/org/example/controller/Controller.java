@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-// TODO: Сделать singleton класс
+
 public class Controller {
     private static Controller inctance;
     private final Model model;
