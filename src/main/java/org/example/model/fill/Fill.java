@@ -9,6 +9,14 @@ public class Fill implements FillBehavior {
     private Color color;
     private RectangularShape shape;
 
+
+    @Override
+    public FillBehavior copy() {
+        Fill copy = new Fill();
+        copy.setColor(this.color);
+        return copy;
+    }
+
     @Override
     public void setColor(Color color) {
         this.color = color;

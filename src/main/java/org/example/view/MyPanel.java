@@ -20,13 +20,15 @@ public class MyPanel extends JPanel implements Observer {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent arg0) {
-                controller.getPointOne(arg0.getPoint());
+                controller.startDrawing(arg0.getPoint());
             }
         });
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent arg0) {
-                controller.getPointTwo(arg0.getPoint());
+                controller.updateDrawing(arg0.getPoint());
+                repaint();
+
             }
         });
     }
@@ -40,7 +42,7 @@ public class MyPanel extends JPanel implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        repaint();
+        repaint(); // Вызывается при изменении модели
     }
 
 }

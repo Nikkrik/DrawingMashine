@@ -2,6 +2,7 @@ package org.example.model;
 
 import org.example.model.fill.Fill;
 import org.example.model.fill.FillBehavior;
+import org.example.model.fill.NoFill;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -9,7 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-public class MyShape {
+public class MyShape implements Cloneable {
     private final Color color;
     private RectangularShape shape;
     private FillBehavior fb;
@@ -20,6 +21,27 @@ public class MyShape {
         fb = new Fill();
         fb.setColor(color);
         fb.setShape(shape);
+    }
+
+    public MyShape clone() {
+        // Создаем копию формы
+        RectangularShape shapeCopy = (RectangularShape) this.shape.clone();
+
+        // Создаем новый FillBehavior того же типа
+        FillBehavior fbCopy;
+        if (this.fb instanceof Fill) {
+            fbCopy = new Fill();
+        } else if (this.fb instanceof NoFill) {
+            fbCopy = new NoFill();
+        } else {
+            fbCopy = new Fill(); // fallback
+        }
+        fbCopy.setColor(this.color);
+        fbCopy.setShape(shapeCopy);
+
+        // Создаем новую фигуру
+        MyShape cloned = new MyShape(this.color, shapeCopy, fbCopy);
+        return cloned;
     }
 
     // TODO: Попробовать вызовы через разные конструкторы, затем переделать создание через фабрику
