@@ -37,7 +37,6 @@ public class Controller {
         actionDraw = new ActionDraw(model, sampleShape);
 
         panel = new MyPanel(this);
-        // TODO: Поменять наблюдатель на более современную реализацию
         model.addObserver(panel);
 
         frame = new MyFrame();

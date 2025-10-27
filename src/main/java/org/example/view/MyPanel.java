@@ -1,6 +1,7 @@
 package org.example.view;
 
 import org.example.controller.Controller;
+import org.example.model.ModelObserver;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,7 +13,7 @@ import java.util.Observer;
 import javax.swing.JPanel;
 
 
-public class MyPanel extends JPanel implements Observer {
+public class MyPanel extends JPanel implements ModelObserver {
     private final Controller controller;
 
     public MyPanel(Controller controller) {
@@ -41,7 +42,7 @@ public class MyPanel extends JPanel implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
+    public void onModelChanged(){
         repaint(); // Вызывается при изменении модели
     }
 
