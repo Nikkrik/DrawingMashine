@@ -3,13 +3,14 @@ package org.example.controller;
 import org.example.controller.action.ActionDraw;
 import org.example.model.Model;
 import org.example.model.MyShape;
-import org.example.model.fill.NoFill;
 import org.example.view.MyFrame;
 import org.example.view.MyPanel;
+import org.example.model.shape.ShapeType;
+import org.example.model.shape.factory.MyShapeFactory;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+
 
 
 public class Controller {
@@ -17,8 +18,6 @@ public class Controller {
     private final Model model;
     private final MyFrame frame;
     private final MyPanel panel;
-    private Point2D firstPoint;
-    private Point2D secondPoint;
     private ActionDraw actionDraw;
 
     public static Controller getInctance(){
@@ -31,8 +30,8 @@ public class Controller {
     }
     private Controller() {
         model = new Model();
-        MyShape sampleShape = new MyShape(new Rectangle2D.Double());
-        sampleShape.setFb(new NoFill());
+
+        MyShape sampleShape = MyShapeFactory.createShape(ShapeType.RECTANGLE);
 
         actionDraw = new ActionDraw(model, sampleShape);
 
@@ -41,6 +40,10 @@ public class Controller {
 
         frame = new MyFrame();
         frame.setPanel(panel);
+    }
+    public void setShapeType(ShapeType type){
+        MyShape sampleshape = MyShapeFactory.createShape(type);
+        actionDraw = new ActionDraw(model, sampleshape);
     }
     public void startDrawing(Point2D p) {
         actionDraw.startDrawing(p);

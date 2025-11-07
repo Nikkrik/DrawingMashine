@@ -16,13 +16,13 @@ public class Model extends RenameObservers {
     public void createCurrentShape(MyShape shape) {
         this.currentShape = shape;
         shapes.add(shape);
-
+        notifyObservers();
     }
 
     public void changeShape(Point2D x, Point2D y) {
         if (currentShape != null) {
             currentShape.setFrame(x, y);
-
+            notifyObservers();
         }
     }
 

@@ -14,7 +14,7 @@ public class RenameObservers {
         observers.remove(observer);
     }
 
-    private void notifyObservers() {
+    protected void notifyObservers() {
         for (ModelObserver observer : observers) {
             observer.onModelChanged();
         }
