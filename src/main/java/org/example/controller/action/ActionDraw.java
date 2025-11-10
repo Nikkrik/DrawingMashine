@@ -18,7 +18,7 @@ public class ActionDraw {
 
     public void startDrawing(Point2D point) {
         startPoint = point;
-        // Создаем копию образца фигуры
+        // Создаем копию образца фигуры с текущими настройками
         currentShape = sampleShape.clone();
         model.createCurrentShape(currentShape);
         currentShape.setFrame(startPoint, startPoint);
