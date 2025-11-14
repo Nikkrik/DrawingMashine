@@ -44,7 +44,7 @@ public class MyShape implements Cloneable {
         return cloned;
     }
 
-    // TODO: Попробовать вызовы через разные конструкторы, затем переделать создание через фабрику
+
     public MyShape() {
         color = Color.BLUE;
         shape = new Rectangle2D.Double();
@@ -53,7 +53,7 @@ public class MyShape implements Cloneable {
         fb.setShape(shape);
     }
 
-    // TODO: Попробовать вызовы через разные конструкторы, затем переделать создание через фабрику
+
     public MyShape(Color color, RectangularShape shape, FillBehavior fb) {
         this.color = color;
         this.shape = shape;

@@ -18,11 +18,9 @@ public class Controller {
     private final MyFrame frame;
     private final MyPanel panel;
     private ActionDraw actionDraw;
+    private MenuState menuState;
 
-    // Текущие настройки
-    private ShapeType currentShapeType = ShapeType.RECTANGLE;
-    private Color currentColor = Color.GRAY;
-    private FillType currentFillType = FillType.FILL;
+
 
     public static Controller getInstance() {
         synchronized (Controller.class) {
@@ -35,44 +33,50 @@ public class Controller {
 
     private Controller() {
         model = new Model();
+        menuState = new MenuState();
 
-        // Создаем начальную фигуру с текущими настройками
         MyShape sampleShape = createSampleShape();
         actionDraw = new ActionDraw(model, sampleShape);
 
         panel = new MyPanel(this);
         model.addObserver(panel);
-
         frame = new MyFrame();
         frame.setPanel(panel);
+
 
         // Устанавливаем связь между контроллерами после полной инициализации
         MenuController menuController = MenuController.getInstance();
         menuController.setMainController(this);
         frame.setMenu();
+
+        frame.revalidate();
     }
 
     private MyShape createSampleShape() {
-        return MyShapeFactory.createShape(currentShapeType, currentColor, currentFillType);
+        return MyShapeFactory.createShape(
+                menuState.getShapeType(),
+                menuState.getColor(),
+                menuState.getFillType()
+        );
     }
 
     public void setShapeType(ShapeType type) {
-        this.currentShapeType = type;
+        this.menuState.setShapeType(type);
         updateActionDraw();
     }
 
     public void setCurrentColor(Color color) {
-        this.currentColor = color;
+        this.menuState.setColor(color);
         updateActionDraw();
     }
 
     public void setFillType(FillType fillType) {
-        this.currentFillType = fillType;
+        this.menuState.setFill(fillType == FillType.FILL);
         updateActionDraw();
     }
 
     public Color getCurrentColor() {
-        return currentColor;
+        return menuState.getColor();
     }
 
     private void updateActionDraw() {
