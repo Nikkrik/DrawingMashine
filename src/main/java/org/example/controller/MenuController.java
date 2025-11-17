@@ -52,8 +52,6 @@ public class MenuController {
         shapeMenu.add(rectangleItem);
         shapeMenu.add(ellipseItem);
 
-
-
         JMenu colorMenu = new JMenu("Цвет");
 
         JMenuItem chooseColorItem  = new JMenuItem("Выбрать цвет...");
@@ -78,8 +76,6 @@ public class MenuController {
         colorMenu.add(blueColor);
         colorMenu.add(greenColor);
 
-
-
         JMenu fillMenu = new JMenu("Заливка");
         ButtonGroup fillGroup = new ButtonGroup();
 
@@ -103,9 +99,34 @@ public class MenuController {
         fillMenu.add(fillItem);
         fillMenu.add(noFillItem);
 
+        // Меню выбора действия
+        JMenu actionMenu = new JMenu("Режим");
+        ButtonGroup actionGroup = new ButtonGroup();
+
+        JRadioButtonMenuItem drawItem = new JRadioButtonMenuItem("Рисование");
+        drawItem.setSelected(true);
+        drawItem.addActionListener(e -> {
+            if (mainController != null) {
+                mainController.setDrawingAction();
+            }
+        });
+
+        JRadioButtonMenuItem moveItem = new JRadioButtonMenuItem("Перемещение");
+        moveItem.addActionListener(e -> {
+            if (mainController != null) {
+                mainController.setMovingAction();
+            }
+        });
+
+        actionGroup.add(drawItem);
+        actionGroup.add(moveItem);
+        actionMenu.add(drawItem);
+        actionMenu.add(moveItem);
+
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(fillMenu);
+        menuBar.add(actionMenu);
 
         return menuBar;
     }

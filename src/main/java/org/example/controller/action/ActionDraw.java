@@ -5,7 +5,7 @@ import org.example.model.MyShape;
 
 import java.awt.geom.Point2D;
 
-public class ActionDraw {
+public class ActionDraw implements AppAction {
     private MyShape sampleShape;
     private MyShape currentShape;
     private Point2D startPoint;
@@ -16,7 +16,13 @@ public class ActionDraw {
         this.sampleShape = sampleShape;
     }
 
-    public void startDrawing(Point2D point) {
+    // Метод для обновления образца фигуры
+    public void setSampleShape(MyShape sampleShape) {
+        this.sampleShape = sampleShape;
+    }
+
+    @Override
+    public void mousePressed(Point2D point) {
         startPoint = point;
         // Создаем копию образца фигуры с текущими настройками
         currentShape = sampleShape.clone();
@@ -24,7 +30,8 @@ public class ActionDraw {
         currentShape.setFrame(startPoint, startPoint);
     }
 
-    public void updateDrawing(Point2D point) {
+    @Override
+    public void mouseDragged(Point2D point) {
         if (currentShape != null) {
             currentShape.setFrame(startPoint, point);
         }

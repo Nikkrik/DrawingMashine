@@ -47,11 +47,4 @@ public class MyShapeFactory {
 
         return new MyShape(color, shape, fillBehavior);
     }
-    public static MyShape createShape(ShapeType type){
-        return createShape(type, Color.GRAY, FillType.FILL);
-    }
-    public static MyShape createShape(ShapeType type, Color color){
-        return createShape(type, color, FillType.FILL);
-    }
-
 }
