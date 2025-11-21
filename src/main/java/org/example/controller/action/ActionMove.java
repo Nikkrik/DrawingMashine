@@ -9,11 +9,9 @@ public class ActionMove implements AppAction {
     private MyShape shape;
     private Point2D firstPoint;
     private Model model;
-
     public ActionMove(Model model) {
         this.model = model;
     }
-
     @Override
     public void mousePressed(Point2D point) {
         // Ищем фигуру, на которую было совершено нажатие
@@ -25,7 +23,6 @@ public class ActionMove implements AppAction {
 
         firstPoint = point;
     }
-
     @Override
     public void mouseDragged(Point2D point) {
         if (shape == null) {

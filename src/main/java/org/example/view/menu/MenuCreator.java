@@ -8,6 +8,7 @@ import org.example.model.shape.fill.FillType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -25,12 +26,12 @@ public class MenuCreator {
     }
 
     private MenuCreator() {
-        // Не инициализируем mainController здесь
     }
 
     public void setMainController(Controller controller) {
         this.mainController = controller;
     }
+
     public void setState(MenuState menuState) {
         this.menuState = menuState;
     }
@@ -68,19 +69,19 @@ public class MenuCreator {
 
         JMenu colorMenu = new JMenu("Цвет");
 
-        JMenuItem chooseColorItem  = new JMenuItem("Выбрать цвет...");
+        JMenuItem chooseColorItem = new JMenuItem("Выбрать цвет...");
         chooseColorItem.addActionListener(e -> showColorChooser());
 
-        JMenuItem blackColor  = new JMenuItem("Черный");
+        JMenuItem blackColor = new JMenuItem("Черный");
         blackColor.addActionListener(e -> setCurrentColor(Color.BLACK));
 
-        JMenuItem redColor  = new JMenuItem("Красный");
+        JMenuItem redColor = new JMenuItem("Красный");
         redColor.addActionListener(e -> setCurrentColor(Color.RED));
 
-        JMenuItem blueColor  = new JMenuItem("Синий");
+        JMenuItem blueColor = new JMenuItem("Синий");
         blueColor.addActionListener(e -> setCurrentColor(Color.BLUE));
 
-        JMenuItem greenColor  = new JMenuItem("Зеленый");
+        JMenuItem greenColor = new JMenuItem("Зеленый");
         greenColor.addActionListener(e -> setCurrentColor(Color.GREEN));
 
         colorMenu.add(chooseColorItem);
@@ -98,6 +99,7 @@ public class MenuCreator {
         fillItem.addActionListener(e -> {
             if (mainController != null) {
                 mainController.setFillType(FillType.FILL);
+                fillItem.setSelected(true);
             }
         });
 
@@ -105,6 +107,7 @@ public class MenuCreator {
         noFillItem.addActionListener(e -> {
             if (mainController != null) {
                 mainController.setFillType(FillType.NO_FILL);
+                noFillItem.setSelected(false);
             }
         });
 
@@ -113,24 +116,15 @@ public class MenuCreator {
         fillMenu.add(fillItem);
         fillMenu.add(noFillItem);
 
-        // Меню выбора действия
         JMenu actionMenu = new JMenu("Режим");
         ButtonGroup actionGroup = new ButtonGroup();
 
         JRadioButtonMenuItem drawItem = new JRadioButtonMenuItem("Рисование");
         drawItem.setSelected(true);
-        drawItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setDrawingAction();
-            }
-        });
+        drawItem.addActionListener(e -> mainController.setDrawingAction());
 
         JRadioButtonMenuItem moveItem = new JRadioButtonMenuItem("Перемещение");
-        moveItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setMovingAction();
-            }
-        });
+        moveItem.addActionListener(e -> mainController.setMovingAction());
 
         actionGroup.add(drawItem);
         actionGroup.add(moveItem);
@@ -145,39 +139,83 @@ public class MenuCreator {
         return menuBar;
     }
 
-    private void showColorChooser(){
-        if (mainController != null){
+    private void showColorChooser() {
+        if (mainController != null) {
             Color chosenColor = JColorChooser.showDialog(null, "Выберете цвет", mainController.getCurrentColor());
-            if(chosenColor != null){
+            if (chosenColor != null) {
                 mainController.setCurrentColor(chosenColor);
             }
         }
     }
 
-    private void setCurrentColor(Color color){
-        if (mainController != null){
+    private void setCurrentColor(Color color) {
+        if (mainController != null) {
             mainController.setCurrentColor(color);
         }
     }
 
-    public JToolBar createToolBar(){
+    public JToolBar createToolBar() {
         ArrayList<Action> subMenuItems = createToolBarItems();
         JToolBar jToolBar = new JToolBar();
 
-        for(Action x : subMenuItems){
+        for (Action x : subMenuItems) {
             jToolBar.add(x);
         }
         return jToolBar;
     }
 
-    private ArrayList<Action> createToolBarItems(){
+    private ArrayList<Action> createToolBarItems() {
         ArrayList<Action> menuItems = new ArrayList<>();
 
+        // Кнопка выбора цвета
         URL colorUrl = getClass().getClassLoader().getResource("image/color_16x16.png");
         ImageIcon colorIco = colorUrl == null ? null : new ImageIcon(colorUrl);
-        JRadioButtonMenuItem rgbButton = new JRadioButtonMenuItem(colorIco);
-        AppCommand colorCommand = new SwitchColor(menuState, false, null, rgbButton);
-        menuItems.add(new CommandActionListener("Цвет", colorIco, colorCommand));
+        menuItems.add(new AbstractAction("Цвет", colorIco) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showColorChooser();
+            }
+        });
+
+        // Кнопка режима рисования
+        URL drawUrl = getClass().getClassLoader().getResource("image/draw_16x16.png");
+        ImageIcon drawIco = drawUrl == null ? null : new ImageIcon(drawUrl);
+        menuItems.add(new AbstractAction("Рисование", drawIco) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mainController != null) mainController.setDrawingAction();
+            }
+        });
+
+        // Кнопка режима перемещения
+        URL moveUrl = getClass().getClassLoader().getResource("image/move_16x16.png");
+        ImageIcon moveIco = moveUrl == null ? null : new ImageIcon(moveUrl);
+        menuItems.add(new AbstractAction("Перемещение", moveIco) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mainController != null) mainController.setMovingAction();
+            }
+        });
+
+        // Кнопка заливки
+        URL fillUrl = getClass().getClassLoader().getResource("image/fill_16x16.png");
+        ImageIcon fillIco = fillUrl == null ? null : new ImageIcon(fillUrl);
+        menuItems.add(new AbstractAction("Заливка", fillIco) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mainController != null) mainController.setFillType(FillType.FILL);
+            }
+        });
+
+        // Кнопка без заливки
+        URL noFillUrl = getClass().getClassLoader().getResource("image/no_fill_16x16.png");
+        ImageIcon noFillIco = noFillUrl == null ? null : new ImageIcon(noFillUrl);
+        menuItems.add(new AbstractAction("Без заливки", noFillIco) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mainController != null) mainController.setFillType(FillType.NO_FILL);
+            }
+        });
 
         return menuItems;
     }

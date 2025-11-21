@@ -15,12 +15,9 @@ public class ActionDraw implements AppAction {
         this.model = model;
         this.sampleShape = sampleShape;
     }
-
-    // Метод для обновления образца фигуры
     public void setSampleShape(MyShape sampleShape) {
         this.sampleShape = sampleShape;
     }
-
     @Override
     public void mousePressed(Point2D point) {
         startPoint = point;
@@ -29,7 +26,6 @@ public class ActionDraw implements AppAction {
         model.createCurrentShape(currentShape);
         currentShape.setFrame(startPoint, startPoint);
     }
-
     @Override
     public void mouseDragged(Point2D point) {
         if (currentShape != null) {

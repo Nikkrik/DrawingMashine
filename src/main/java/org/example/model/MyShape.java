@@ -18,32 +18,27 @@ public class MyShape implements Cloneable{
     public MyShape(Color color, RectangularShape shape, FillBehavior fb) {
         this.shape = shape;
         this.color = color;
-        this.fb = new Fill();
+        this.fb = fb;
         this.fb.setColor(color);
         this.fb.setShape(shape);
     }
 
     public MyShape clone() {
-        // Создаем копию формы
-        RectangularShape shapeCopy = (RectangularShape) this.shape.clone();
+        try {
 
-        // Создаем новый FillBehavior того же типа
-        FillBehavior fbCopy;
-        if (this.fb instanceof Fill) {
-            fbCopy = new Fill();
-        } else if (this.fb instanceof NoFill) {
-            fbCopy = new NoFill();
-        } else {
-            fbCopy = new Fill(); // fallback
+            RectangularShape shapeCopy = (RectangularShape) this.shape.clone();
+
+            FillBehavior fbCopy = this.fb.copy();
+            fbCopy.setColor(this.color);
+            fbCopy.setShape(shapeCopy);
+
+            MyShape cloned = new MyShape(this.color, shapeCopy, fbCopy);
+            return cloned;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        fbCopy.setColor(this.color);
-        fbCopy.setShape(shapeCopy);
-
-        // Создаем новую фигуру
-        MyShape cloned = new MyShape(this.color, shapeCopy, fbCopy);
-        return cloned;
     }
-
     public RectangularShape getShape() {
         return shape;
     }

@@ -8,14 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.JPanel;
-
 
 public class MyPanel extends JPanel implements ModelObserver {
     private final Controller controller;
-
     public MyPanel(Controller controller) {
         this.controller = controller;
         addMouseListener(new MouseAdapter() {
@@ -33,14 +29,12 @@ public class MyPanel extends JPanel implements ModelObserver {
             }
         });
     }
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         controller.draw(g2);
     }
-
     @Override
     public void onModelChanged(){
         repaint(); // Вызывается при изменении модели

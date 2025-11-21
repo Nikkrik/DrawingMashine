@@ -1,17 +1,20 @@
 package org.example.view.menu;
 
-import org.example.controller.MenuState;
-import org.example.controller.action.AppAction;
+import org.example.controller.Controller;
 
-public class SwitchAction implements AppCommand{
-    private AppAction action;
-    private MenuState menuState;
-
-    public SwitchAction(AppAction action, MenuState menuState) {
-        this.action = action;
-        this.menuState = menuState;
+public class SwitchAction implements AppCommand {
+    private Controller controller;
+    private boolean isDrawingMode;
+    public SwitchAction(Controller controller, boolean isDrawingMode) {
+        this.controller = controller;
+        this.isDrawingMode = isDrawingMode;
     }
-
     @Override
-    public void execute(){}
+    public void execute() {
+        if (isDrawingMode) {
+            controller.setDrawingAction();
+        } else {
+            controller.setMovingAction();
+        }
+    }
 }

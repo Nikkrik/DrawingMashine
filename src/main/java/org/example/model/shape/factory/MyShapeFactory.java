@@ -12,9 +12,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-
-
-
 public class MyShapeFactory {
     public static MyShape createShape(ShapeType type, Color color, FillType fillType) {
 
