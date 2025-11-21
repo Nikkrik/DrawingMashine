@@ -1,6 +1,6 @@
 package org.example.view;
 
-import org.example.controller.MenuController;
+import org.example.view.menu.MenuCreator;
 
 import javax.swing.*;
 
@@ -19,7 +19,7 @@ public class MyFrame extends JFrame {
     }
 
     public void setMenu() {
-        MenuController menuController = MenuController.getInstance();
-        setJMenuBar(menuController.createMenuBar());
+        MenuCreator menuCreator = MenuCreator.getInstance();
+        setJMenuBar(menuCreator.createMenuBar());
     }
 }

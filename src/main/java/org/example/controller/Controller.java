@@ -10,6 +10,7 @@ import org.example.view.MyFrame;
 import org.example.view.MyPanel;
 import org.example.model.shape.ShapeType;
 import org.example.model.shape.fill.FillType;
+import org.example.view.menu.MenuCreator;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -52,10 +53,11 @@ public class Controller {
         frame = new MyFrame();
         frame.setPanel(panel);
 
-        // Устанавливаем связь между контроллерами после полной инициализации
-        MenuController menuController = MenuController.getInstance();
-        menuController.setMainController(this);
-        frame.setMenu();
+
+        MenuCreator menuCreator = MenuCreator.getInstance();
+        menuCreator.setState(menuState);
+        menuCreator.setModel(model);
+        frame.setJMenuBar(menuCreator.createMenuBar());
         frame.revalidate();
     }
 

@@ -15,7 +15,7 @@ public class Model extends RenameObservers {
 
     public void createCurrentShape(MyShape shape) {
         this.currentShape = shape;
-        shapes.add(shape); // Важно: добавляем фигуру в список
+        shapes.add(shape);
         notifyObservers();
     }
 

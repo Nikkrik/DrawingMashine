@@ -1,28 +1,42 @@
-package org.example.controller;
+package org.example.view.menu;
 
+import org.example.controller.Controller;
+import org.example.controller.MenuState;
+import org.example.model.Model;
 import org.example.model.shape.ShapeType;
 import org.example.model.shape.fill.FillType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.URL;
+import java.util.ArrayList;
 
-public class MenuController {
-    private static MenuController instance;
+public class MenuCreator {
+    private static MenuCreator instance;
     private Controller mainController;
+    private MenuState menuState;
+    private Model model;
 
-    public static MenuController getInstance() {
+    public static MenuCreator getInstance() {
         if (instance == null) {
-            instance = new MenuController();
+            instance = new MenuCreator();
         }
         return instance;
     }
 
-    private MenuController() {
+    private MenuCreator() {
         // Не инициализируем mainController здесь
     }
 
     public void setMainController(Controller controller) {
         this.mainController = controller;
+    }
+    public void setState(MenuState menuState) {
+        this.menuState = menuState;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
 
     public JMenuBar createMenuBar() {
@@ -144,5 +158,27 @@ public class MenuController {
         if (mainController != null){
             mainController.setCurrentColor(color);
         }
+    }
+
+    public JToolBar createToolBar(){
+        ArrayList<Action> subMenuItems = createToolBarItems();
+        JToolBar jToolBar = new JToolBar();
+
+        for(Action x : subMenuItems){
+            jToolBar.add(x);
+        }
+        return jToolBar;
+    }
+
+    private ArrayList<Action> createToolBarItems(){
+        ArrayList<Action> menuItems = new ArrayList<>();
+
+        URL colorUrl = getClass().getClassLoader().getResource("image/color_16x16.png");
+        ImageIcon colorIco = colorUrl == null ? null : new ImageIcon(colorUrl);
+        JRadioButtonMenuItem rgbButton = new JRadioButtonMenuItem(colorIco);
+        AppCommand colorCommand = new SwitchColor(menuState, false, null, rgbButton);
+        menuItems.add(new CommandActionListener("Цвет", colorIco, colorCommand));
+
+        return menuItems;
     }
 }
