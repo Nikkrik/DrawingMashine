@@ -1,8 +1,9 @@
 package org.example.controller;
 
-import org.example.controller.action.ActionDraw;
-import org.example.controller.action.ActionMove;
-import org.example.controller.action.AppAction;
+import org.example.controller.actions.ActionDraw;
+import org.example.controller.actions.ActionMove;
+import org.example.controller.actions.AppAction;
+import org.example.controller.state.UndoMachine;
 import org.example.model.Model;
 import org.example.model.MyShape;
 import org.example.model.shape.factory.ShapeCreator;
@@ -25,6 +26,7 @@ public class Controller {
     private MenuState menuState;
     private ShapeCreator shapeCreator;
     private ActionDraw actionDraw;
+    private UndoMachine undoMachine;
 
     public static Controller getInstance() {
         synchronized (Controller.class) {
@@ -37,6 +39,7 @@ public class Controller {
     private Controller() {
         model = new Model();
         menuState = new MenuState();
+        undoMachine = new UndoMachine();
 
         shapeCreator = ShapeCreator.getInstance();
         shapeCreator.configure(menuState);
@@ -55,6 +58,8 @@ public class Controller {
         menuCreator.setState(menuState);
         menuCreator.setModel(model);
         menuCreator.setMainController(this);
+        menuCreator.setUndoMachine(undoMachine);
+
         JToolBar toolBar = menuCreator.createToolBar();
         toolBar.setOrientation(JToolBar.VERTICAL);
         frame.add(toolBar, BorderLayout.WEST);
@@ -98,13 +103,23 @@ public class Controller {
 
     public void startDrawing(Point2D p) {
         currentAction.mousePressed(p);
+        undoMachine.add(currentAction.cloneAction());
+        undoMachine.updateButtons();
     }
 
-    public void updateDrawing(Point2D p) {
-        currentAction.mouseDragged(p);
-    }
+        public void updateDrawing(Point2D p) {
+            currentAction.mouseDragged(p);
+        }
 
-    public void draw(Graphics2D g2) {
+        public void draw(Graphics2D g2) {
         model.draw(g2);
+    }
+
+    public void undo() {
+        undoMachine.executeUndo();
+    }
+
+    public void redo() {
+        undoMachine.executeRedo();
     }
 }

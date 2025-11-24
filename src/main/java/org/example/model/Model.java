@@ -1,42 +1,59 @@
 package org.example.model;
 
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Model extends RenameObservers {
+    private List<MyShape> shapeList = new ArrayList<>();
     private MyShape currentShape;
-    private List<MyShape> shapes = new ArrayList<>();
-
-    public void setMyShape(MyShape myShape) {
-        this.currentShape = myShape;
-    }
 
     public void createCurrentShape(MyShape shape) {
         this.currentShape = shape;
-        shapes.add(shape);
+        shapeList.add(shape);
         notifyObservers();
     }
 
-    public void changeShape(Point2D x, Point2D y) {
-        if (currentShape != null) {
-            currentShape.setFrame(x, y);
+    public void addCurrentShape(MyShape shape) {
+        shapeList.add(shape);
+        notifyObservers();
+    }
+
+    public void addShape(MyShape shape) {
+        shapeList.add(shape);
+        notifyObservers();
+    }
+
+    public void removeShape(MyShape shape) {
+        shapeList.remove(shape);
+        notifyObservers();
+    }
+
+    public MyShape getLastShape() {
+        if (!shapeList.isEmpty()) {
+            return shapeList.get(shapeList.size() - 1);
+        }
+        return null;
+    }
+
+    public void removeLastShape() {
+        if (!shapeList.isEmpty()) {
+            shapeList.remove(shapeList.size() - 1);
             notifyObservers();
         }
     }
 
     public List<MyShape> getShapeList() {
-        return shapes;
+        return new ArrayList<>(shapeList);
     }
 
     public void update() {
         notifyObservers();
     }
 
-    public void draw(Graphics2D g) {
-        for (MyShape shape : shapes) {
-            shape.draw(g);
+    public void draw(Graphics2D g2) {
+        for (MyShape shape : shapeList) {
+            shape.draw(g2);
         }
     }
 }

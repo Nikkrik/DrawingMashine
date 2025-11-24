@@ -2,6 +2,7 @@ package org.example.view.menu;
 
 import org.example.controller.Controller;
 import org.example.controller.MenuState;
+import org.example.controller.state.UndoMachine;
 import org.example.model.Model;
 import org.example.model.shape.ShapeType;
 import org.example.model.shape.fill.FillType;
@@ -17,6 +18,7 @@ public class MenuCreator {
     private Controller mainController;
     private MenuState menuState;
     private Model model;
+    private UndoMachine undoMachine;
 
     public static MenuCreator getInstance() {
         if (instance == null) {
@@ -38,6 +40,10 @@ public class MenuCreator {
 
     public void setModel(Model model) {
         this.model = model;
+    }
+
+    public void setUndoMachine(UndoMachine undoMachine) {
+        this.undoMachine = undoMachine;
     }
 
     public JMenuBar createMenuBar() {
@@ -136,8 +142,36 @@ public class MenuCreator {
         menuBar.add(fillMenu);
         menuBar.add(actionMenu);
 
+        // Меню Edit с Undo/Redo
+        JMenu editMenu = new JMenu("Правка");
+
+        // Undo
+        JMenuItem undoItem = new JMenuItem("Отменить");
+        CommandActionListener undoActionListener = new CommandActionListener(new SwitchUndo(undoMachine));
+        undoItem.addActionListener(undoActionListener);
+        undoMachine.setUndoActionListener(undoActionListener);
+
+        // Redo
+        JMenuItem redoItem = new JMenuItem("Повторить");
+        CommandActionListener redoActionListener = new CommandActionListener(new SwitchRedo(undoMachine));
+        redoItem.addActionListener(redoActionListener);
+        undoMachine.setRedoActionListener(redoActionListener);
+
+        editMenu.add(undoItem);
+        editMenu.add(redoItem);
+
+        menuBar.add(shapeMenu);
+        menuBar.add(colorMenu);
+        menuBar.add(fillMenu);
+        menuBar.add(actionMenu);
+        menuBar.add(editMenu); // Добавляем меню правки
+
+        // Обновляем состояние кнопок при создании
+        undoMachine.updateButtons();
+
         return menuBar;
     }
+
 
     private void showColorChooser() {
         if (mainController != null) {
@@ -216,6 +250,24 @@ public class MenuCreator {
                 if (mainController != null) mainController.setFillType(FillType.NO_FILL);
             }
         });
+
+        // Кнопка Undo
+        URL undoToolbarUrl = getClass().getClassLoader().getResource("image/undo_16x16.png");
+        ImageIcon undoToolbarIco = undoToolbarUrl == null ? null : new ImageIcon(undoToolbarUrl);
+        AppCommand undoToolbarCommand = new SwitchUndo(undoMachine);
+        CommandActionListener undoToolbarAction = new CommandActionListener("Отменить", undoToolbarIco, undoToolbarCommand);
+        menuItems.add(undoToolbarAction);
+
+        // Кнопка Redo
+        URL redoToolbarUrl = getClass().getClassLoader().getResource("image/redo_16x16.png");
+        ImageIcon redoToolbarIco = redoToolbarUrl == null ? null : new ImageIcon(redoToolbarUrl);
+        AppCommand redoToolbarCommand = new SwitchRedo(undoMachine);
+        CommandActionListener redoToolbarAction = new CommandActionListener("Повторить", redoToolbarIco, redoToolbarCommand);
+        menuItems.add(redoToolbarAction);
+
+        // Передаем слушатели в UndoMachine
+        undoMachine.setUndoActionListener(undoToolbarAction);
+        undoMachine.setRedoActionListener(redoToolbarAction);
 
         return menuItems;
     }
