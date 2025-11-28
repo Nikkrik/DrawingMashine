@@ -205,7 +205,7 @@ public class MenuCreator {
         URL colorUrl = getClass().getClassLoader().getResource("image/color_16x16.png");
         ImageIcon colorIco = colorUrl == null ? null : new ImageIcon(colorUrl);
         JRadioButtonMenuItem rgbButton = new JRadioButtonMenuItem(colorIco);
-        AppCommand colorCommand = new SwitchColor(menuState, false, null, rgbButton);
+        AppCommand colorCommand = new SwitchColor(menuState,false, null, rgbButton, mainController);
         menuItems.add(new CommandActionListener("Цвет", colorIco, colorCommand));
 
         // Кнопка режима рисования
