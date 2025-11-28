@@ -20,14 +20,14 @@ public class StateEnableUndoEnableRedo extends UndoRedoState {
             action.unexecute();
         }
 
-        if (undoActivityList.size() == 0) {
-            if (redoActivityList.size() > 0) {
+        if (undoActivityList.isEmpty()) {
+            if (!redoActivityList.isEmpty()) {
                 return new StateDisableUndoEnableRedo(undoActivityList, redoActivityList);
             } else {
                 return new StateDisableUndoDisableRedo(undoActivityList, redoActivityList);
             }
         } else {
-            if (redoActivityList.size() > 0) {
+            if (!redoActivityList.isEmpty()) {
                 return this;
             } else {
                 return new StateEnableUndoDisableRedo(undoActivityList, redoActivityList);
@@ -45,14 +45,14 @@ public class StateEnableUndoEnableRedo extends UndoRedoState {
             action.execute();
         }
 
-        if (redoActivityList.size() == 0) {
-            if (undoActivityList.size() > 0) {
+        if (redoActivityList.isEmpty()) {
+            if (!undoActivityList.isEmpty()) {
                 return new StateEnableUndoDisableRedo(undoActivityList, redoActivityList);
             } else {
                 return new StateDisableUndoDisableRedo(undoActivityList, redoActivityList);
             }
         } else {
-            if (undoActivityList.size() > 0) {
+            if (!undoActivityList.isEmpty()) {
                 return this;
             } else {
                 return new StateDisableUndoEnableRedo(undoActivityList, redoActivityList);

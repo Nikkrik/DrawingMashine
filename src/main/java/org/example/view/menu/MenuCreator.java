@@ -204,52 +204,37 @@ public class MenuCreator {
         // Кнопка выбора цвета
         URL colorUrl = getClass().getClassLoader().getResource("image/color_16x16.png");
         ImageIcon colorIco = colorUrl == null ? null : new ImageIcon(colorUrl);
-        menuItems.add(new AbstractAction("Цвет", colorIco) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showColorChooser();
-            }
-        });
+        JRadioButtonMenuItem rgbButton = new JRadioButtonMenuItem(colorIco);
+        AppCommand colorCommand = new SwitchColor(menuState, false, null, rgbButton);
+        menuItems.add(new CommandActionListener("Цвет", colorIco, colorCommand));
 
         // Кнопка режима рисования
         URL drawUrl = getClass().getClassLoader().getResource("image/draw_16x16.png");
         ImageIcon drawIco = drawUrl == null ? null : new ImageIcon(drawUrl);
-        menuItems.add(new AbstractAction("Рисование", drawIco) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mainController != null) mainController.setDrawingAction();
-            }
-        });
+        AppCommand drawToolCommand = new SwitchAction(mainController, true);
+        CommandActionListener drawToolAction = new CommandActionListener("Рисование", drawIco, drawToolCommand);
+        menuItems.add(drawToolAction);
 
         // Кнопка режима перемещения
         URL moveUrl = getClass().getClassLoader().getResource("image/move_16x16.png");
         ImageIcon moveIco = moveUrl == null ? null : new ImageIcon(moveUrl);
-        menuItems.add(new AbstractAction("Перемещение", moveIco) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mainController != null) mainController.setMovingAction();
-            }
-        });
+        AppCommand moveToolCommand = new SwitchAction(mainController, false);
+        CommandActionListener moveToolAction = new CommandActionListener("Перемещение", moveIco, moveToolCommand);
+        menuItems.add(moveToolAction);
 
         // Кнопка заливки
         URL fillUrl = getClass().getClassLoader().getResource("image/fill_16x16.png");
         ImageIcon fillIco = fillUrl == null ? null : new ImageIcon(fillUrl);
-        menuItems.add(new AbstractAction("Заливка", fillIco) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mainController != null) mainController.setFillType(FillType.FILL);
-            }
-        });
+        AppCommand fillToolCommand = new SwitchFill(menuState, true);
+        CommandActionListener fillToolAction = new CommandActionListener("С заливкой", fillIco, fillToolCommand);
+        menuItems.add(fillToolAction);
 
         // Кнопка без заливки
         URL noFillUrl = getClass().getClassLoader().getResource("image/no_fill_16x16.png");
         ImageIcon noFillIco = noFillUrl == null ? null : new ImageIcon(noFillUrl);
-        menuItems.add(new AbstractAction("Без заливки", noFillIco) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mainController != null) mainController.setFillType(FillType.NO_FILL);
-            }
-        });
+        AppCommand noFillToolCommand = new SwitchFill(menuState, false);
+        CommandActionListener noFillToolAction = new CommandActionListener("Без заливки",noFillIco, noFillToolCommand);
+        menuItems.add(noFillToolAction);
 
         // Кнопка Undo
         URL undoToolbarUrl = getClass().getClassLoader().getResource("image/undo_16x16.png");

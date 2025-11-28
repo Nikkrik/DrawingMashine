@@ -2,9 +2,6 @@ package org.example.view.menu;
 
 import org.example.controller.MenuState;
 import org.example.model.shape.ShapeType;
-
-
-
 import javax.swing.*;
 
 public class SwitchShape implements AppCommand {
