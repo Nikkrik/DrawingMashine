@@ -48,6 +48,12 @@ public class ActionDraw implements AppAction {
     }
 
     @Override
+    public void mouseReleased(Point2D point) {
+        // Для ActionDraw завершаем рисование
+        execute();
+    }
+
+    @Override
     public void execute() {
         model.addCurrentShape(drawableShape);
         model.update();

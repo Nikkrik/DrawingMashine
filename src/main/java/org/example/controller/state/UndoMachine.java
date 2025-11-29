@@ -35,6 +35,7 @@ public class UndoMachine {
     }
 
     public void add(AppAction action) {
+        // Очищаем историю redo только при добавлении нового действия
         undoRedoState.clearHistory();
         undoRedoState.addAction(action);
 
@@ -42,14 +43,14 @@ public class UndoMachine {
         LinkedList<AppAction> undoList = undoRedoState.getUndoActivityList();
         LinkedList<AppAction> redoList = undoRedoState.getRedoActivityList();
 
-        if (undoList.size() > 0) {
-            if (redoList.size() > 0) {
+        if (!undoList.isEmpty()) {
+            if (!redoList.isEmpty()) {
                 undoRedoState = new StateEnableUndoEnableRedo(undoList, redoList);
             } else {
                 undoRedoState = new StateEnableUndoDisableRedo(undoList, redoList);
             }
         } else {
-            if (redoList.size() > 0) {
+            if (!redoList.isEmpty()) {
                 undoRedoState = new StateDisableUndoEnableRedo(undoList, redoList);
             } else {
                 undoRedoState = new StateDisableUndoDisableRedo(undoList, redoList);

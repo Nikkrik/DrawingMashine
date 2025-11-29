@@ -19,6 +19,10 @@ public class MyPanel extends JPanel implements ModelObserver {
             public void mousePressed(MouseEvent arg0) {
                 controller.startDrawing(arg0.getPoint());
             }
+            public void mouseReleased(MouseEvent arg0) {
+                // Завершаем действие при отпускании мыши
+                controller.finishDrawing(arg0.getPoint());
+            }
         });
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override

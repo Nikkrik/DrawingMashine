@@ -4,13 +4,16 @@ import org.example.model.Model;
 import org.example.model.MyShape;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public class ActionMove implements AppAction {
     private MyShape shape;
-    private Point2D firstPoint;
+    private Point2D startPoint;
     private Point2D lastPoint;
     private Model model;
-    private Point2D originalPosition;
+    private Rectangle2D originalBounds;
+    private double totalDeltaX;
+    private double totalDeltaY;
 
     public ActionMove(Model model) {
         this.model = model;
@@ -24,12 +27,12 @@ public class ActionMove implements AppAction {
                 .findFirst()
                 .orElse(null);
 
-        firstPoint = point;
+        startPoint = point;
         if (shape != null) {
-            originalPosition = new Point2D.Double(
-                    shape.getShape().getCenterX(),
-                    shape.getShape().getCenterY()
-            );
+            // Сохраняем оригинальные границы фигуры
+            originalBounds = shape.getShape().getBounds2D();
+            totalDeltaX = 0;
+            totalDeltaY = 0;
         }
     }
 
@@ -39,10 +42,10 @@ public class ActionMove implements AppAction {
             return;
         }
 
-        double deltaX = point.getX() - firstPoint.getX();
-        double deltaY = point.getY() - firstPoint.getY();
+        double deltaX = point.getX() - startPoint.getX();
+        double deltaY = point.getY() - startPoint.getY();
 
-        // Исправленный метод установки рамки
+        // Перемещаем фигуру
         double newX = shape.getShape().getX() + deltaX;
         double newY = shape.getShape().getY() + deltaY;
         double width = shape.getShape().getWidth();
@@ -50,38 +53,48 @@ public class ActionMove implements AppAction {
 
         shape.getShape().setFrame(newX, newY, width, height);
 
+        // Накопляем общее смещение
+        totalDeltaX += deltaX;
+        totalDeltaY += deltaY;
+
         lastPoint = point;
-        firstPoint = point;
+        startPoint = point;
         model.update();
     }
 
     @Override
+    public void mouseReleased(Point2D point) {
+        // Для ActionMove ничего не делаем при отпускании,
+        // так как действие уже завершено в mouseDragged
+    }
+
+    @Override
     public void execute() {
-        if (shape != null && lastPoint != null) {
-            double deltaX = lastPoint.getX() - firstPoint.getX();
-            double deltaY = lastPoint.getY() - firstPoint.getY();
+        // Для redo: применяем накопленное смещение
+        if (shape != null && originalBounds != null) {
+            double newX = originalBounds.getX() + totalDeltaX;
+            double newY = originalBounds.getY() + totalDeltaY;
 
-            double newX = shape.getShape().getX() + deltaX;
-            double newY = shape.getShape().getY() + deltaY;
-            double width = shape.getShape().getWidth();
-            double height = shape.getShape().getHeight();
-
-            shape.getShape().setFrame(newX, newY, width, height);
+            shape.getShape().setFrame(
+                    newX,
+                    newY,
+                    originalBounds.getWidth(),
+                    originalBounds.getHeight()
+            );
             model.update();
         }
     }
 
     @Override
     public void unexecute() {
-        if (shape != null && originalPosition != null) {
-            // Возвращаем фигуру в исходное положение
-            double width = shape.getShape().getWidth();
-            double height = shape.getShape().getHeight();
-
-            double newX = originalPosition.getX() - width / 2;
-            double newY = originalPosition.getY() - height / 2;
-
-            shape.getShape().setFrame(newX, newY, width, height);
+        // Для undo: возвращаем к оригинальным границам
+        if (shape != null && originalBounds != null) {
+            shape.getShape().setFrame(
+                    originalBounds.getX(),
+                    originalBounds.getY(),
+                    originalBounds.getWidth(),
+                    originalBounds.getHeight()
+            );
             model.update();
         }
     }
@@ -90,9 +103,17 @@ public class ActionMove implements AppAction {
     public AppAction cloneAction() {
         ActionMove clone = new ActionMove(model);
         clone.shape = this.shape;
-        clone.firstPoint = this.firstPoint != null ? (Point2D) this.firstPoint.clone() : null;
-        clone.lastPoint = this.lastPoint != null ? (Point2D) this.lastPoint.clone() : null;
-        clone.originalPosition = this.originalPosition != null ? (Point2D) this.originalPosition.clone() : null;
+        clone.startPoint = this.startPoint != null ? new Point2D.Double(this.startPoint.getX(), this.startPoint.getY()) : null;
+        clone.lastPoint = this.lastPoint != null ? new Point2D.Double(this.lastPoint.getX(), this.lastPoint.getY()) : null;
+        clone.originalBounds = this.originalBounds != null ?
+                new Rectangle2D.Double(
+                        this.originalBounds.getX(),
+                        this.originalBounds.getY(),
+                        this.originalBounds.getWidth(),
+                        this.originalBounds.getHeight()
+                ) : null;
+        clone.totalDeltaX = this.totalDeltaX;
+        clone.totalDeltaY = this.totalDeltaY;
         return clone;
     }
 }

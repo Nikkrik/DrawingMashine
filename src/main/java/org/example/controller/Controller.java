@@ -64,7 +64,6 @@ public class Controller {
         toolBar.setOrientation(JToolBar.VERTICAL);
         frame.add(toolBar, BorderLayout.WEST);
         frame.setJMenuBar(menuCreator.createMenuBar());
-        //frame.add(menuCreator.createToolBar(), BorderLayout.NORTH); //кнопки будут в строку
         frame.revalidate();
     }
     public void setShapeType(ShapeType type) {
@@ -107,11 +106,19 @@ public class Controller {
         undoMachine.updateButtons();
     }
 
-        public void updateDrawing(Point2D p) {
-            currentAction.mouseDragged(p);
-        }
+    public void updateDrawing(Point2D p) {
+        currentAction.mouseDragged(p);
+    }
 
-        public void draw(Graphics2D g2) {
+    public void finishDrawing(Point2D p) {
+        // Клонируем действие только после завершения перемещения
+        if (currentAction instanceof ActionMove) {
+            AppAction clonedAction = currentAction.cloneAction();
+            undoMachine.add(clonedAction);
+        }
+    }
+
+    public void draw(Graphics2D g2) {
         model.draw(g2);
     }
 
