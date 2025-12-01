@@ -12,36 +12,22 @@ public class StateDisableUndoEnableRedo extends UndoRedoState{
 
     @Override
     public UndoRedoState undo() {
-        return this;
+        return this; // Undo недоступен
     }
 
     @Override
     public UndoRedoState redo() {
-        LinkedList<AppAction> undoActivityList = getUndoActivityList();
-        LinkedList<AppAction> redoActivityList = getRedoActivityList();
+        if (getRedoActivityList().isEmpty()) return this;
 
-        if (redoActivityList.isEmpty()) {
-            return this;
-        }
+        AppAction action = getRedoActivityList().removeLast();
+        getUndoActivityList().addLast(action);
+        action.execute();
 
-        AppAction action = redoActivityList.removeLast();
-        if (action != null) {
-            undoActivityList.add(action);
-            action.execute();
-        }
+        boolean canUndo = !getUndoActivityList().isEmpty();
+        boolean canRedo = !getRedoActivityList().isEmpty();
 
-        if (redoActivityList.isEmpty()) {
-            if (undoActivityList.isEmpty()) {
-                return new StateDisableUndoDisableRedo(undoActivityList, redoActivityList);
-            } else {
-                return new StateEnableUndoDisableRedo(undoActivityList, redoActivityList);
-            }
-        } else {
-            if (undoActivityList.isEmpty()) {
-                return this;
-            } else {
-                return new StateEnableUndoEnableRedo(undoActivityList, redoActivityList);
-            }
-        }
+        if (canUndo && canRedo) return new StateEnableUndoEnableRedo(getUndoActivityList(), getRedoActivityList());
+        if (canUndo) return new StateEnableUndoDisableRedo(getUndoActivityList(), getRedoActivityList());
+        return this;
     }
 }

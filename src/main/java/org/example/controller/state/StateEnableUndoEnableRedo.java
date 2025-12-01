@@ -12,61 +12,33 @@ public class StateEnableUndoEnableRedo extends UndoRedoState {
 
     @Override
     public UndoRedoState undo() {
-        LinkedList<AppAction> undoActivityList = getUndoActivityList();
-        LinkedList<AppAction> redoActivityList = getRedoActivityList();
+        if (getUndoActivityList().isEmpty()) return this;
 
-        if (undoActivityList.isEmpty()) {
-            return this;
-        }
+        AppAction action = getUndoActivityList().removeLast();
+        getRedoActivityList().addLast(action);
+        action.unexecute();
 
-        AppAction action = undoActivityList.removeLast();
-        if (action != null) {
-            redoActivityList.add(action);
-            action.unexecute();
-        }
-
-        if (undoActivityList.isEmpty()) {
-            if (redoActivityList.isEmpty()) {
-                return new StateDisableUndoDisableRedo(undoActivityList, redoActivityList);
-            } else {
-                return new StateDisableUndoEnableRedo(undoActivityList, redoActivityList);
-            }
-        } else {
-            if (redoActivityList.isEmpty()) {
-                return new StateEnableUndoDisableRedo(undoActivityList, redoActivityList);
-            } else {
-                return this;
-            }
-        }
+        return createNewState();
     }
 
     @Override
     public UndoRedoState redo() {
-        LinkedList<AppAction> undoActivityList = getUndoActivityList();
-        LinkedList<AppAction> redoActivityList = getRedoActivityList();
+        if (getRedoActivityList().isEmpty()) return this;
 
-        if (redoActivityList.isEmpty()) {
-            return this;
-        }
+        AppAction action = getRedoActivityList().removeLast();
+        getUndoActivityList().addLast(action);
+        action.execute();
 
-        AppAction action = redoActivityList.removeLast();
-        if (action != null) {
-            undoActivityList.add(action);
-            action.execute();
-        }
+        return createNewState();
+    }
 
-        if (redoActivityList.isEmpty()) {
-            if (undoActivityList.isEmpty()) {
-                return new StateDisableUndoDisableRedo(undoActivityList, redoActivityList);
-            } else {
-                return new StateEnableUndoDisableRedo(undoActivityList, redoActivityList);
-            }
-        } else {
-            if (undoActivityList.isEmpty()) {
-                return new StateDisableUndoEnableRedo(undoActivityList, redoActivityList);
-            } else {
-                return this;
-            }
-        }
+    private UndoRedoState createNewState() {
+        boolean canUndo = !getUndoActivityList().isEmpty();
+        boolean canRedo = !getRedoActivityList().isEmpty();
+
+        if (canUndo && canRedo) return this;
+        if (canUndo) return new StateEnableUndoDisableRedo(getUndoActivityList(), getRedoActivityList());
+        if (canRedo) return new StateDisableUndoEnableRedo(getUndoActivityList(), getRedoActivityList());
+        return new StateDisableUndoDisableRedo(getUndoActivityList(), getRedoActivityList());
     }
 }

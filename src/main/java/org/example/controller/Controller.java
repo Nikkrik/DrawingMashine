@@ -27,6 +27,7 @@ public class Controller {
     private ShapeCreator shapeCreator;
     private ActionDraw actionDraw;
     private UndoMachine undoMachine;
+    private AppAction pendingAction; // Действие, ожидающее завершения
 
     public static Controller getInstance() {
         synchronized (Controller.class) {
@@ -102,8 +103,10 @@ public class Controller {
 
     public void startDrawing(Point2D p) {
         currentAction.mousePressed(p);
-        undoMachine.add(currentAction.cloneAction());
-        undoMachine.updateButtons();
+        // Для рисования добавляем действие сразу
+        if (currentAction instanceof ActionDraw) {
+            pendingAction = currentAction.cloneAction();
+        }
     }
 
     public void updateDrawing(Point2D p) {
@@ -111,10 +114,15 @@ public class Controller {
     }
 
     public void finishDrawing(Point2D p) {
-        // Клонируем действие только после завершения перемещения
+        // Для перемещения добавляем действие только после завершения
         if (currentAction instanceof ActionMove) {
-            AppAction clonedAction = currentAction.cloneAction();
-            undoMachine.add(clonedAction);
+            pendingAction = currentAction.cloneAction();
+        }
+
+        // Добавляем действие в историю
+        if (pendingAction != null) {
+            undoMachine.add(pendingAction);
+            pendingAction = null;
         }
     }
 

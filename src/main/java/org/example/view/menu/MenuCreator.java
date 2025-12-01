@@ -252,7 +252,9 @@ public class MenuCreator {
 
         // Передаем слушатели в UndoMachine
         undoMachine.setUndoActionListener(undoToolbarAction);
+        undoToolbarAction.setEnabled(false);
         undoMachine.setRedoActionListener(redoToolbarAction);
+        redoToolbarAction.setEnabled(false);
 
         return menuItems;
     }

@@ -17,22 +17,30 @@ public abstract class UndoRedoState {
     public abstract UndoRedoState undo();
     public abstract UndoRedoState redo();
 
-    public void clearHistory(){
+    public void clearHistory() {
         redoActivityList.clear();
     }
 
-    public void addAction(AppAction action){
-        if(undoActivityList.size() < MAX_UNDO){
-            undoActivityList.add(action);
+    public void addAction(AppAction action) {
+        if (undoActivityList.size() >= MAX_UNDO) {
+            undoActivityList.removeFirst(); // Удаляем самое старое действие
         }
+        undoActivityList.addLast(action);
     }
 
-    // Добавляем геттеры вручную
     public LinkedList<AppAction> getUndoActivityList() {
         return undoActivityList;
     }
 
     public LinkedList<AppAction> getRedoActivityList() {
         return redoActivityList;
+    }
+
+    public boolean canUndo() {
+        return !undoActivityList.isEmpty();
+    }
+
+    public boolean canRedo() {
+        return !redoActivityList.isEmpty();
     }
 }

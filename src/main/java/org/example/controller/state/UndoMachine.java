@@ -6,57 +6,54 @@ import org.example.view.menu.CommandActionListener;
 import java.util.LinkedList;
 
 public class UndoMachine {
-    private UndoRedoState undoRedoState;
+    private UndoRedoState currentState;
     private CommandActionListener undoActionListener;
     private CommandActionListener redoActionListener;
 
     public UndoMachine() {
-        LinkedList<AppAction> undoList = new LinkedList<>();
-        LinkedList<AppAction> redoList = new LinkedList<>();
-        undoRedoState = new StateDisableUndoDisableRedo(undoList, redoList);
+        currentState = new StateDisableUndoDisableRedo(new LinkedList<>(), new LinkedList<>());
     }
 
     public void executeRedo() {
-        undoRedoState = undoRedoState.redo();
+        currentState = currentState.redo();
         updateButtons();
     }
 
     public void executeUndo() {
-        undoRedoState = undoRedoState.undo();
+        currentState = currentState.undo();
         updateButtons();
     }
 
     public boolean isEnableUndo() {
-        return undoRedoState.getUndoActivityList().size() > 0;
+        return currentState.canUndo();
     }
 
     public boolean isEnableRedo() {
-        return undoRedoState.getRedoActivityList().size() > 0;
+        return currentState.canRedo();
     }
 
     public void add(AppAction action) {
-        // Очищаем историю redo только при добавлении нового действия
-        undoRedoState.clearHistory();
-        undoRedoState.addAction(action);
+        currentState.clearHistory();
+        currentState.addAction(action);
 
-        // Определяем новое состояние после добавления действия
-        LinkedList<AppAction> undoList = undoRedoState.getUndoActivityList();
-        LinkedList<AppAction> redoList = undoRedoState.getRedoActivityList();
-
-        if (!undoList.isEmpty()) {
-            if (!redoList.isEmpty()) {
-                undoRedoState = new StateEnableUndoEnableRedo(undoList, redoList);
-            } else {
-                undoRedoState = new StateEnableUndoDisableRedo(undoList, redoList);
-            }
-        } else {
-            if (!redoList.isEmpty()) {
-                undoRedoState = new StateDisableUndoEnableRedo(undoList, redoList);
-            } else {
-                undoRedoState = new StateDisableUndoDisableRedo(undoList, redoList);
-            }
-        }
+        // Пересоздаем состояние с учетом новых списков
+        currentState = createAppropriateState();
         updateButtons();
+    }
+
+    private UndoRedoState createAppropriateState() {
+        LinkedList<AppAction> undoList = currentState.getUndoActivityList();
+        LinkedList<AppAction> redoList = currentState.getRedoActivityList();
+
+        if (undoList.isEmpty()) {
+            return redoList.isEmpty() ?
+                    new StateDisableUndoDisableRedo(undoList, redoList) :
+                    new StateDisableUndoEnableRedo(undoList, redoList);
+        } else {
+            return redoList.isEmpty() ?
+                    new StateEnableUndoDisableRedo(undoList, redoList) :
+                    new StateEnableUndoEnableRedo(undoList, redoList);
+        }
     }
 
     public void setUndoActionListener(CommandActionListener undoActionListener) {
