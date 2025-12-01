@@ -43,6 +43,11 @@ public class Model extends RenameObservers {
         }
     }
 
+    public void clear() {
+        shapeList.clear();
+        notifyObservers();
+    }
+
     public List<MyShape> getShapeList() {
         return new ArrayList<>(shapeList);
     }

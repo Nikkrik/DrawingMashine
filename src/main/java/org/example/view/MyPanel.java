@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 public class MyPanel extends JPanel implements ModelObserver {
     private final Controller controller;
+
     public MyPanel(Controller controller) {
         this.controller = controller;
         addMouseListener(new MouseAdapter() {
@@ -19,29 +20,38 @@ public class MyPanel extends JPanel implements ModelObserver {
             public void mousePressed(MouseEvent arg0) {
                 controller.startDrawing(arg0.getPoint());
             }
+
+            @Override
             public void mouseReleased(MouseEvent arg0) {
                 // Завершаем действие при отпускании мыши
                 controller.finishDrawing(arg0.getPoint());
+                // Обновляем кнопки после завершения рисования/перемещения
+                controller.updateUndoRedoButtons();
             }
         });
+
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent arg0) {
                 controller.updateDrawing(arg0.getPoint());
                 repaint();
-
             }
         });
     }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         controller.draw(g2);
     }
+
     @Override
     public void onModelChanged(){
         repaint(); // Вызывается при изменении модели
+        // Обновляем кнопки при изменении модели
+        if (controller != null) {
+            controller.updateUndoRedoButtons();
+        }
     }
-
 }

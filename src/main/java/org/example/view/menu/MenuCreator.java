@@ -20,6 +20,12 @@ public class MenuCreator {
     private Model model;
     private UndoMachine undoMachine;
 
+    // Храним ссылки на элементы меню для обновления
+    private JMenuItem undoMenuItem;
+    private JMenuItem redoMenuItem;
+    private CommandActionListener undoToolbarAction;
+    private CommandActionListener redoToolbarAction;
+
     public static MenuCreator getInstance() {
         if (instance == null) {
             instance = new MenuCreator();
@@ -137,41 +143,51 @@ public class MenuCreator {
         actionMenu.add(drawItem);
         actionMenu.add(moveItem);
 
-        menuBar.add(shapeMenu);
-        menuBar.add(colorMenu);
-        menuBar.add(fillMenu);
-        menuBar.add(actionMenu);
-
         // Меню Edit с Undo/Redo
         JMenu editMenu = new JMenu("Правка");
 
         // Undo
-        JMenuItem undoItem = new JMenuItem("Отменить");
+        undoMenuItem = new JMenuItem("Отменить");
         CommandActionListener undoActionListener = new CommandActionListener(new SwitchUndo(undoMachine));
-        undoItem.addActionListener(undoActionListener);
-        undoMachine.setUndoActionListener(undoActionListener);
+        undoMenuItem.addActionListener(undoActionListener);
+        undoMenuItem.setEnabled(false); // Изначально выключена
 
         // Redo
-        JMenuItem redoItem = new JMenuItem("Повторить");
+        redoMenuItem = new JMenuItem("Повторить");
         CommandActionListener redoActionListener = new CommandActionListener(new SwitchRedo(undoMachine));
-        redoItem.addActionListener(redoActionListener);
+        redoMenuItem.addActionListener(redoActionListener);
+        redoMenuItem.setEnabled(false); // Изначально выключена
+
+        // Передаем слушатели в UndoMachine
+        undoMachine.setUndoActionListener(undoActionListener);
         undoMachine.setRedoActionListener(redoActionListener);
 
-        editMenu.add(undoItem);
-        editMenu.add(redoItem);
+        editMenu.add(undoMenuItem);
+        editMenu.add(redoMenuItem);
 
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(fillMenu);
         menuBar.add(actionMenu);
-        menuBar.add(editMenu); // Добавляем меню правки
-
-        // Обновляем состояние кнопок при создании
-        undoMachine.updateButtons();
+        menuBar.add(editMenu);
 
         return menuBar;
     }
 
+    public void updateMenuButtons() {
+        if (undoMenuItem != null) {
+            undoMenuItem.setEnabled(undoMachine != null && undoMachine.isEnableUndo());
+        }
+        if (redoMenuItem != null) {
+            redoMenuItem.setEnabled(undoMachine != null && undoMachine.isEnableRedo());
+        }
+        if (undoToolbarAction != null) {
+            undoToolbarAction.setEnabled(undoMachine != null && undoMachine.isEnableUndo());
+        }
+        if (redoToolbarAction != null) {
+            redoToolbarAction.setEnabled(undoMachine != null && undoMachine.isEnableRedo());
+        }
+    }
 
     private void showColorChooser() {
         if (mainController != null) {
@@ -240,21 +256,23 @@ public class MenuCreator {
         URL undoToolbarUrl = getClass().getClassLoader().getResource("image/undo_16x16.png");
         ImageIcon undoToolbarIco = undoToolbarUrl == null ? null : new ImageIcon(undoToolbarUrl);
         AppCommand undoToolbarCommand = new SwitchUndo(undoMachine);
-        CommandActionListener undoToolbarAction = new CommandActionListener("Отменить", undoToolbarIco, undoToolbarCommand);
+        undoToolbarAction = new CommandActionListener("Отменить", undoToolbarIco, undoToolbarCommand);
+        undoToolbarAction.setEnabled(false); // Изначально выключена
         menuItems.add(undoToolbarAction);
 
         // Кнопка Redo
         URL redoToolbarUrl = getClass().getClassLoader().getResource("image/redo_16x16.png");
         ImageIcon redoToolbarIco = redoToolbarUrl == null ? null : new ImageIcon(redoToolbarUrl);
         AppCommand redoToolbarCommand = new SwitchRedo(undoMachine);
-        CommandActionListener redoToolbarAction = new CommandActionListener("Повторить", redoToolbarIco, redoToolbarCommand);
+        redoToolbarAction = new CommandActionListener("Повторить", redoToolbarIco, redoToolbarCommand);
+        redoToolbarAction.setEnabled(false); // Изначально выключена
         menuItems.add(redoToolbarAction);
 
         // Передаем слушатели в UndoMachine
-        undoMachine.setUndoActionListener(undoToolbarAction);
-        undoToolbarAction.setEnabled(false);
-        undoMachine.setRedoActionListener(redoToolbarAction);
-        redoToolbarAction.setEnabled(false);
+        if (undoMachine != null) {
+            undoMachine.setUndoActionListener(undoToolbarAction);
+            undoMachine.setRedoActionListener(redoToolbarAction);
+        }
 
         return menuItems;
     }

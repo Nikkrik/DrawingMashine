@@ -27,7 +27,8 @@ public class Controller {
     private ShapeCreator shapeCreator;
     private ActionDraw actionDraw;
     private UndoMachine undoMachine;
-    private AppAction pendingAction; // Действие, ожидающее завершения
+    private AppAction pendingAction;
+    private MenuCreator menuCreator;
 
     public static Controller getInstance() {
         synchronized (Controller.class) {
@@ -37,6 +38,7 @@ public class Controller {
             return instance;
         }
     }
+
     private Controller() {
         model = new Model();
         menuState = new MenuState();
@@ -55,7 +57,7 @@ public class Controller {
         frame = new MyFrame();
         frame.setPanel(panel);
 
-        MenuCreator menuCreator = MenuCreator.getInstance();
+        menuCreator = MenuCreator.getInstance();
         menuCreator.setState(menuState);
         menuCreator.setModel(model);
         menuCreator.setMainController(this);
@@ -67,21 +69,26 @@ public class Controller {
         frame.setJMenuBar(menuCreator.createMenuBar());
         frame.revalidate();
     }
+
     public void setShapeType(ShapeType type) {
         this.menuState.setShapeType(type);
         updateCurrentAction();
     }
+
     public void setCurrentColor(Color color) {
         this.menuState.setColor(color);
         updateCurrentAction();
     }
+
     public void setFillType(FillType fillType) {
         this.menuState.setFill(fillType == FillType.FILL);
         updateCurrentAction();
     }
+
     public Color getCurrentColor() {
         return menuState.getColor();
     }
+
     public void setDrawingAction() {
         shapeCreator.configure(menuState);
         MyShape sampleShape = shapeCreator.createShape();
@@ -103,7 +110,6 @@ public class Controller {
 
     public void startDrawing(Point2D p) {
         currentAction.mousePressed(p);
-        // Для рисования добавляем действие сразу
         if (currentAction instanceof ActionDraw) {
             pendingAction = currentAction.cloneAction();
         }
@@ -114,15 +120,14 @@ public class Controller {
     }
 
     public void finishDrawing(Point2D p) {
-        // Для перемещения добавляем действие только после завершения
         if (currentAction instanceof ActionMove) {
             pendingAction = currentAction.cloneAction();
         }
 
-        // Добавляем действие в историю
         if (pendingAction != null) {
             undoMachine.add(pendingAction);
             pendingAction = null;
+            updateUndoRedoButtons();
         }
     }
 
@@ -132,9 +137,24 @@ public class Controller {
 
     public void undo() {
         undoMachine.executeUndo();
+        updateUndoRedoButtons();
     }
 
     public void redo() {
         undoMachine.executeRedo();
+        updateUndoRedoButtons();
+    }
+
+    public void updateUndoRedoButtons() {
+        undoMachine.updateButtons();
+        if (menuCreator != null) {
+            menuCreator.updateMenuButtons();
+        }
+    }
+
+    public void clearModel() {
+        model.clear();
+        undoMachine.clearHistory();
+        updateUndoRedoButtons();
     }
 }

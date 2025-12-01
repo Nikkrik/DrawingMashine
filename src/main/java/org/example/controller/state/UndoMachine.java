@@ -25,19 +25,28 @@ public class UndoMachine {
     }
 
     public boolean isEnableUndo() {
-        return currentState.canUndo();
+        return !currentState.getUndoActivityList().isEmpty();
     }
 
     public boolean isEnableRedo() {
-        return currentState.canRedo();
+        return !currentState.getRedoActivityList().isEmpty();
     }
 
     public void add(AppAction action) {
+        if (action == null) return;
+
         currentState.clearHistory();
         currentState.addAction(action);
 
-        // Пересоздаем состояние с учетом новых списков
+        // Пересоздаем состояние
         currentState = createAppropriateState();
+        updateButtons();
+    }
+
+    public void clearHistory() {
+        currentState.getUndoActivityList().clear();
+        currentState.getRedoActivityList().clear();
+        currentState = new StateDisableUndoDisableRedo(new LinkedList<>(), new LinkedList<>());
         updateButtons();
     }
 
@@ -58,10 +67,16 @@ public class UndoMachine {
 
     public void setUndoActionListener(CommandActionListener undoActionListener) {
         this.undoActionListener = undoActionListener;
+        if (undoActionListener != null) {
+            undoActionListener.setEnabled(isEnableUndo());
+        }
     }
 
     public void setRedoActionListener(CommandActionListener redoActionListener) {
         this.redoActionListener = redoActionListener;
+        if (redoActionListener != null) {
+            redoActionListener.setEnabled(isEnableRedo());
+        }
     }
 
     public void updateButtons() {

@@ -21,6 +21,11 @@ public abstract class UndoRedoState {
         redoActivityList.clear();
     }
 
+    public void clearAll() {
+        undoActivityList.clear();
+        redoActivityList.clear();
+    }
+
     public void addAction(AppAction action) {
         if (undoActivityList.size() >= MAX_UNDO) {
             undoActivityList.removeFirst(); // Удаляем самое старое действие
