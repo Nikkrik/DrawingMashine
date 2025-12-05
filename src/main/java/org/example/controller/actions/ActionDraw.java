@@ -2,17 +2,14 @@ package org.example.controller.actions;
 
 import org.example.model.Model;
 import org.example.model.MyShape;
-import org.example.model.shape.factory.ShapeCreator;
-
 import java.awt.geom.Point2D;
 
 public class ActionDraw implements AppAction {
     private MyShape sampleShape;
     private MyShape currentShape;
     private Point2D startPoint;
-    private Model model;
+    private final Model model;
     private MyShape drawableShape;
-    private ShapeCreator factory;
 
     public ActionDraw(Model model, MyShape sampleShape) {
         this.model = model;
@@ -30,7 +27,6 @@ public class ActionDraw implements AppAction {
     @Override
     public void mousePressed(Point2D point) {
         startPoint = point;
-        // Создаем копию образца фигуры с текущими настройками
         currentShape = sampleShape.clone();
         drawableShape = currentShape;
         model.createCurrentShape(currentShape);
@@ -45,12 +41,6 @@ public class ActionDraw implements AppAction {
                 drawableShape.setFrame(startPoint, point);
             }
         }
-    }
-
-    @Override
-    public void mouseReleased(Point2D point) {
-        // Для ActionDraw завершаем рисование
-        execute();
     }
 
     @Override

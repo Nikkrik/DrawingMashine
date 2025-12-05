@@ -4,14 +4,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RenameObservers {
-    private List<ModelObserver> observers =  new CopyOnWriteArrayList<>();
+    private final List<ModelObserver> observers =  new CopyOnWriteArrayList<>();
 
     public void addObserver(ModelObserver observer) {
         observers.add(observer);
-    }
-
-    public void removeObserver(ModelObserver observer) {
-        observers.remove(observer);
     }
 
     protected void notifyObservers() {
@@ -19,5 +15,4 @@ public class RenameObservers {
             observer.onModelChanged();
         }
     }
-
 }

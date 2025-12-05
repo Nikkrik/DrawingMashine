@@ -3,13 +3,10 @@ package org.example.view.menu;
 import org.example.controller.Controller;
 import org.example.controller.MenuState;
 import org.example.controller.state.UndoMachine;
-import org.example.model.Model;
 import org.example.model.shape.ShapeType;
-import org.example.model.shape.fill.FillType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -17,10 +14,7 @@ public class MenuCreator {
     private static MenuCreator instance;
     private Controller mainController;
     private MenuState menuState;
-    private Model model;
     private UndoMachine undoMachine;
-
-    // Храним ссылки на элементы меню для обновления
     private JMenuItem undoMenuItem;
     private JMenuItem redoMenuItem;
     private CommandActionListener undoToolbarAction;
@@ -44,10 +38,6 @@ public class MenuCreator {
         this.menuState = menuState;
     }
 
-    public void setModel(Model model) {
-        this.model = model;
-    }
-
     public void setUndoMachine(UndoMachine undoMachine) {
         this.undoMachine = undoMachine;
     }
@@ -61,12 +51,12 @@ public class MenuCreator {
 
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem("Прямоугольник");
         rectangleItem.setSelected(true);
-        CommandActionListener rectangleActionListener = new CommandActionListener(new SwitchShape(menuState, ShapeType.RECTANGLE, rectangleItem));
+        CommandActionListener rectangleActionListener = new CommandActionListener(new SwitchShape(menuState, mainController, ShapeType.RECTANGLE, rectangleItem));
         rectangleItem.addActionListener(rectangleActionListener);
         shapeGroup.add(rectangleItem);
 
         JRadioButtonMenuItem ellipseItem = new JRadioButtonMenuItem("Эллипс");
-        CommandActionListener ellipseActionListener = new CommandActionListener(new SwitchShape(menuState, ShapeType.ELLIPSE, ellipseItem));
+        CommandActionListener ellipseActionListener = new CommandActionListener(new SwitchShape(menuState, mainController, ShapeType.ELLIPSE, ellipseItem));
         ellipseItem.addActionListener(ellipseActionListener);
         shapeGroup.add(ellipseItem);
 
@@ -76,19 +66,24 @@ public class MenuCreator {
         JMenu colorMenu = new JMenu("Цвет");
 
         JMenuItem chooseColorItem = new JMenuItem("Выбрать цвет...");
-        chooseColorItem.addActionListener(e -> showColorChooser());
+        CommandActionListener chooseColorActionListener = new CommandActionListener(new SwitchColor(menuState, false, null, null, mainController));
+        chooseColorItem.addActionListener(chooseColorActionListener);
 
         JMenuItem blackColor = new JMenuItem("Черный");
-        blackColor.addActionListener(e -> setCurrentColor(Color.BLACK));
+        CommandActionListener blackColorActionListener = new CommandActionListener(new SwitchColor(menuState, true, Color.BLACK, null, mainController));
+        blackColor.addActionListener(blackColorActionListener);
 
         JMenuItem redColor = new JMenuItem("Красный");
-        redColor.addActionListener(e -> setCurrentColor(Color.RED));
+        CommandActionListener redColorActionListener = new CommandActionListener(new SwitchColor(menuState, true, Color.RED, null, mainController));
+        redColor.addActionListener(redColorActionListener);
 
         JMenuItem blueColor = new JMenuItem("Синий");
-        blueColor.addActionListener(e -> setCurrentColor(Color.BLUE));
+        CommandActionListener blueColorActionListener = new CommandActionListener(new SwitchColor(menuState, true, Color.BLUE, null, mainController));
+        blueColor.addActionListener(blueColorActionListener);
 
         JMenuItem greenColor = new JMenuItem("Зеленый");
-        greenColor.addActionListener(e -> setCurrentColor(Color.GREEN));
+        CommandActionListener greenColorActionListener = new CommandActionListener(new SwitchColor(menuState, true, Color.GREEN, null, mainController));
+        greenColor.addActionListener(greenColorActionListener);
 
         colorMenu.add(chooseColorItem);
         colorMenu.addSeparator();
@@ -97,43 +92,39 @@ public class MenuCreator {
         colorMenu.add(blueColor);
         colorMenu.add(greenColor);
 
+        // Меню заливки
         JMenu fillMenu = new JMenu("Заливка");
         ButtonGroup fillGroup = new ButtonGroup();
 
         JRadioButtonMenuItem fillItem = new JRadioButtonMenuItem("С заливкой");
         fillItem.setSelected(true);
-        fillItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setFillType(FillType.FILL);
-                fillItem.setSelected(true);
-            }
-        });
+        CommandActionListener fillActionListener = new CommandActionListener(new SwitchFill(menuState, mainController, true, fillItem));
+        fillItem.addActionListener(fillActionListener);
+        fillGroup.add(fillItem);
 
         JRadioButtonMenuItem noFillItem = new JRadioButtonMenuItem("Без заливки");
-        noFillItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setFillType(FillType.NO_FILL);
-                noFillItem.setSelected(false);
-            }
-        });
-
-        fillGroup.add(fillItem);
+        CommandActionListener noFillActionListener = new CommandActionListener(new SwitchFill(menuState, mainController, false, noFillItem));
+        noFillItem.addActionListener(noFillActionListener);
         fillGroup.add(noFillItem);
+
         fillMenu.add(fillItem);
         fillMenu.add(noFillItem);
 
+        // Меню режима
         JMenu actionMenu = new JMenu("Режим");
         ButtonGroup actionGroup = new ButtonGroup();
 
         JRadioButtonMenuItem drawItem = new JRadioButtonMenuItem("Рисование");
         drawItem.setSelected(true);
-        drawItem.addActionListener(e -> mainController.setDrawingAction());
+        CommandActionListener drawActionListener = new CommandActionListener(new SwitchAction(mainController, true, drawItem));
+        drawItem.addActionListener(drawActionListener);
+        actionGroup.add(drawItem);
 
         JRadioButtonMenuItem moveItem = new JRadioButtonMenuItem("Перемещение");
-        moveItem.addActionListener(e -> mainController.setMovingAction());
-
-        actionGroup.add(drawItem);
+        CommandActionListener moveActionListener = new CommandActionListener(new SwitchAction(mainController, false, moveItem));
+        moveItem.addActionListener(moveActionListener);
         actionGroup.add(moveItem);
+
         actionMenu.add(drawItem);
         actionMenu.add(moveItem);
 
@@ -159,6 +150,7 @@ public class MenuCreator {
         editMenu.add(undoMenuItem);
         editMenu.add(redoMenuItem);
 
+        // Добавляем все меню в панель меню
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(fillMenu);
@@ -183,21 +175,6 @@ public class MenuCreator {
         }
     }
 
-    private void showColorChooser() {
-        if (mainController != null) {
-            Color chosenColor = JColorChooser.showDialog(null, "Выберете цвет", mainController.getCurrentColor());
-            if (chosenColor != null) {
-                mainController.setCurrentColor(chosenColor);
-            }
-        }
-    }
-
-    private void setCurrentColor(Color color) {
-        if (mainController != null) {
-            mainController.setCurrentColor(color);
-        }
-    }
-
     public JToolBar createToolBar() {
         ArrayList<Action> subMenuItems = createToolBarItems();
         JToolBar jToolBar = new JToolBar();
@@ -214,36 +191,35 @@ public class MenuCreator {
         // Кнопка выбора цвета
         URL colorUrl = getClass().getClassLoader().getResource("image/color_16x16.png");
         ImageIcon colorIco = colorUrl == null ? null : new ImageIcon(colorUrl);
-        JRadioButtonMenuItem rgbButton = new JRadioButtonMenuItem(colorIco);
-        AppCommand colorCommand = new SwitchColor(menuState,false, null, rgbButton, mainController);
+        AppCommand colorCommand = new SwitchColor(menuState, false, null, null, mainController);
         menuItems.add(new CommandActionListener("Цвет", colorIco, colorCommand));
 
         // Кнопка режима рисования
         URL drawUrl = getClass().getClassLoader().getResource("image/draw_16x16.png");
         ImageIcon drawIco = drawUrl == null ? null : new ImageIcon(drawUrl);
-        AppCommand drawToolCommand = new SwitchAction(mainController, true);
+        AppCommand drawToolCommand = new SwitchAction(mainController, true, null);
         CommandActionListener drawToolAction = new CommandActionListener("Рисование", drawIco, drawToolCommand);
         menuItems.add(drawToolAction);
 
         // Кнопка режима перемещения
         URL moveUrl = getClass().getClassLoader().getResource("image/move_16x16.png");
         ImageIcon moveIco = moveUrl == null ? null : new ImageIcon(moveUrl);
-        AppCommand moveToolCommand = new SwitchAction(mainController, false);
+        AppCommand moveToolCommand = new SwitchAction(mainController, false, null);
         CommandActionListener moveToolAction = new CommandActionListener("Перемещение", moveIco, moveToolCommand);
         menuItems.add(moveToolAction);
 
         // Кнопка заливки
         URL fillUrl = getClass().getClassLoader().getResource("image/fill_16x16.png");
         ImageIcon fillIco = fillUrl == null ? null : new ImageIcon(fillUrl);
-        AppCommand fillToolCommand = new SwitchFill(menuState, true);
+        AppCommand fillToolCommand = new SwitchFill(menuState, mainController, true, null);
         CommandActionListener fillToolAction = new CommandActionListener("С заливкой", fillIco, fillToolCommand);
         menuItems.add(fillToolAction);
 
         // Кнопка без заливки
         URL noFillUrl = getClass().getClassLoader().getResource("image/no_fill_16x16.png");
         ImageIcon noFillIco = noFillUrl == null ? null : new ImageIcon(noFillUrl);
-        AppCommand noFillToolCommand = new SwitchFill(menuState, false);
-        CommandActionListener noFillToolAction = new CommandActionListener("Без заливки",noFillIco, noFillToolCommand);
+        AppCommand noFillToolCommand = new SwitchFill(menuState, mainController, false, null);
+        CommandActionListener noFillToolAction = new CommandActionListener("Без заливки", noFillIco, noFillToolCommand);
         menuItems.add(noFillToolAction);
 
         // Кнопка Undo
@@ -269,5 +245,8 @@ public class MenuCreator {
         }
 
         return menuItems;
+    }
+
+    public void setModel() {
     }
 }

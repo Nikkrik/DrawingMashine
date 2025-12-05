@@ -4,11 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.RectangularShape;
-public class Fill implements FillBehavior {
 
+public class Fill implements FillBehavior {
     private Color color;
     private RectangularShape shape;
-
 
     @Override
     public FillBehavior copy() {
@@ -16,7 +15,6 @@ public class Fill implements FillBehavior {
         copy.setColor(this.color);
         return copy;
     }
-
     @Override
     public void setColor(Color color) {
         this.color = color;

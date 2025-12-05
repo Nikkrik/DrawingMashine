@@ -7,7 +7,6 @@ import org.example.model.shape.fill.FillType;
 
 import java.awt.*;
 
-
 public class ShapeCreator {
     private static ShapeCreator instance;
     private MenuState menuState;

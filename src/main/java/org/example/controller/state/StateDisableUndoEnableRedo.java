@@ -1,7 +1,6 @@
 package org.example.controller.state;
 
 import org.example.controller.actions.AppAction;
-
 import java.util.LinkedList;
 
 public class StateDisableUndoEnableRedo extends UndoRedoState{
@@ -12,7 +11,7 @@ public class StateDisableUndoEnableRedo extends UndoRedoState{
 
     @Override
     public UndoRedoState undo() {
-        return this; // Undo недоступен
+        return this;
     }
 
     @Override

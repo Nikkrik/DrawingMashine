@@ -20,22 +20,20 @@ import java.awt.geom.Point2D;
 public class Controller {
     private static Controller instance;
     private final Model model;
-    private final MyFrame frame;
-    private final MyPanel panel;
     private AppAction currentAction;
-    private MenuState menuState;
-    private ShapeCreator shapeCreator;
-    private ActionDraw actionDraw;
-    private UndoMachine undoMachine;
+    private final MenuState menuState;
+    private final ShapeCreator shapeCreator;
+    private final ActionDraw actionDraw;
+    private final UndoMachine undoMachine;
     private AppAction pendingAction;
-    private MenuCreator menuCreator;
+    private final MenuCreator menuCreator;
 
-    public static Controller getInstance() {
+
+    public static void getInstance() {
         synchronized (Controller.class) {
             if (instance == null) {
                 instance = new Controller();
             }
-            return instance;
         }
     }
 
@@ -51,15 +49,15 @@ public class Controller {
         actionDraw = new ActionDraw(model, sampleShape);
         currentAction = actionDraw;
 
-        panel = new MyPanel(this);
+        MyPanel panel = new MyPanel(this);
         model.addObserver(panel);
 
-        frame = new MyFrame();
+        MyFrame frame = new MyFrame();
         frame.setPanel(panel);
 
         menuCreator = MenuCreator.getInstance();
         menuCreator.setState(menuState);
-        menuCreator.setModel(model);
+        menuCreator.setModel();
         menuCreator.setMainController(this);
         menuCreator.setUndoMachine(undoMachine);
 
@@ -85,9 +83,6 @@ public class Controller {
         updateCurrentAction();
     }
 
-    public Color getCurrentColor() {
-        return menuState.getColor();
-    }
 
     public void setDrawingAction() {
         shapeCreator.configure(menuState);
@@ -135,26 +130,10 @@ public class Controller {
         model.draw(g2);
     }
 
-    public void undo() {
-        undoMachine.executeUndo();
-        updateUndoRedoButtons();
-    }
-
-    public void redo() {
-        undoMachine.executeRedo();
-        updateUndoRedoButtons();
-    }
-
     public void updateUndoRedoButtons() {
         undoMachine.updateButtons();
         if (menuCreator != null) {
             menuCreator.updateMenuButtons();
         }
-    }
-
-    public void clearModel() {
-        model.clear();
-        undoMachine.clearHistory();
-        updateUndoRedoButtons();
     }
 }

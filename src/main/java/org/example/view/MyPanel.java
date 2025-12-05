@@ -20,12 +20,9 @@ public class MyPanel extends JPanel implements ModelObserver {
             public void mousePressed(MouseEvent arg0) {
                 controller.startDrawing(arg0.getPoint());
             }
-
             @Override
             public void mouseReleased(MouseEvent arg0) {
-                // Завершаем действие при отпускании мыши
                 controller.finishDrawing(arg0.getPoint());
-                // Обновляем кнопки после завершения рисования/перемещения
                 controller.updateUndoRedoButtons();
             }
         });
@@ -48,8 +45,8 @@ public class MyPanel extends JPanel implements ModelObserver {
 
     @Override
     public void onModelChanged(){
-        repaint(); // Вызывается при изменении модели
-        // Обновляем кнопки при изменении модели
+        repaint();
+
         if (controller != null) {
             controller.updateUndoRedoButtons();
         }

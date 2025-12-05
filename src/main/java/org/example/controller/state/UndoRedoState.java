@@ -1,7 +1,6 @@
 package org.example.controller.state;
 
 import org.example.controller.actions.AppAction;
-
 import java.util.LinkedList;
 
 public abstract class UndoRedoState {

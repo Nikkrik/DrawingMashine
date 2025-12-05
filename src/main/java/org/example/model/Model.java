@@ -5,27 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Model extends RenameObservers {
-    private List<MyShape> shapeList = new ArrayList<>();
-    private MyShape currentShape;
+    private final List<MyShape> shapeList = new ArrayList<>();
 
     public void createCurrentShape(MyShape shape) {
-        this.currentShape = shape;
         shapeList.add(shape);
         notifyObservers();
     }
 
     public void addCurrentShape(MyShape shape) {
         shapeList.add(shape);
-        notifyObservers();
-    }
-
-    public void addShape(MyShape shape) {
-        shapeList.add(shape);
-        notifyObservers();
-    }
-
-    public void removeShape(MyShape shape) {
-        shapeList.remove(shape);
         notifyObservers();
     }
 
@@ -42,12 +30,6 @@ public class Model extends RenameObservers {
             notifyObservers();
         }
     }
-
-    public void clear() {
-        shapeList.clear();
-        notifyObservers();
-    }
-
     public List<MyShape> getShapeList() {
         return new ArrayList<>(shapeList);
     }

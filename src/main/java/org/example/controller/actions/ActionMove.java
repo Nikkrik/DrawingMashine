@@ -10,7 +10,7 @@ public class ActionMove implements AppAction {
     private MyShape shape;
     private Point2D startPoint;
     private Point2D lastPoint;
-    private Model model;
+    private final Model model;
     private Rectangle2D originalBounds;
     private double totalDeltaX;
     private double totalDeltaY;
@@ -29,7 +29,6 @@ public class ActionMove implements AppAction {
 
         startPoint = point;
         if (shape != null) {
-            // Сохраняем оригинальные границы фигуры
             originalBounds = shape.getShape().getBounds2D();
             totalDeltaX = 0;
             totalDeltaY = 0;
@@ -53,7 +52,6 @@ public class ActionMove implements AppAction {
 
         shape.getShape().setFrame(newX, newY, width, height);
 
-        // Накопляем общее смещение
         totalDeltaX += deltaX;
         totalDeltaY += deltaY;
 
@@ -63,14 +61,7 @@ public class ActionMove implements AppAction {
     }
 
     @Override
-    public void mouseReleased(Point2D point) {
-        // Для ActionMove ничего не делаем при отпускании,
-        // так как действие уже завершено в mouseDragged
-    }
-
-    @Override
     public void execute() {
-        // Для redo: применяем накопленное смещение
         if (shape != null && originalBounds != null) {
             double newX = originalBounds.getX() + totalDeltaX;
             double newY = originalBounds.getY() + totalDeltaY;
@@ -87,7 +78,6 @@ public class ActionMove implements AppAction {
 
     @Override
     public void unexecute() {
-        // Для undo: возвращаем к оригинальным границам
         if (shape != null && originalBounds != null) {
             shape.getShape().setFrame(
                     originalBounds.getX(),

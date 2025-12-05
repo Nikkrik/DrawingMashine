@@ -2,7 +2,6 @@ package org.example.controller.state;
 
 import org.example.controller.actions.AppAction;
 import org.example.view.menu.CommandActionListener;
-
 import java.util.LinkedList;
 
 public class UndoMachine {

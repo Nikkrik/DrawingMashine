@@ -6,7 +6,6 @@ import org.example.model.shape.fill.FillType;
 import org.example.model.shape.fill.FillBehavior;
 import java.awt.Color;
 
-
 public class MyShapeFactory {
     public static MyShape createShape(ShapeType type, Color color, FillType fillType){
 
@@ -16,4 +15,4 @@ public class MyShapeFactory {
         return new MyShape(color, shape, fillBehavior);
     }
 }
-// от Type должна создаться фигура и заливка
+

@@ -7,11 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SwitchColor implements AppCommand {
-    private MenuState menuState;
-    private boolean useDefault;
-    private Color defaultColor;
-    private JRadioButtonMenuItem radioButton;
-    private Controller controller;
+    private final MenuState menuState;
+    private final boolean useDefault;
+    private final Color defaultColor;
+    private final JRadioButtonMenuItem radioButton;
+    private final Controller controller;
 
     public SwitchColor(MenuState menuState, boolean useDefault, Color defaultColor, JRadioButtonMenuItem radioButton, Controller controller) {
         this.menuState = menuState;
