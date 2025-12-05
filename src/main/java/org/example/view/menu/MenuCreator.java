@@ -61,21 +61,15 @@ public class MenuCreator {
 
         JRadioButtonMenuItem rectangleItem = new JRadioButtonMenuItem("Прямоугольник");
         rectangleItem.setSelected(true);
-        rectangleItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setShapeType(ShapeType.RECTANGLE);
-            }
-        });
+        CommandActionListener rectangleActionListener = new CommandActionListener(new SwitchShape(menuState, ShapeType.RECTANGLE, rectangleItem));
+        rectangleItem.addActionListener(rectangleActionListener);
+        shapeGroup.add(rectangleItem);
 
         JRadioButtonMenuItem ellipseItem = new JRadioButtonMenuItem("Эллипс");
-        ellipseItem.addActionListener(e -> {
-            if (mainController != null) {
-                mainController.setShapeType(ShapeType.ELLIPSE);
-            }
-        });
-
-        shapeGroup.add(rectangleItem);
+        CommandActionListener ellipseActionListener = new CommandActionListener(new SwitchShape(menuState, ShapeType.ELLIPSE, ellipseItem));
+        ellipseItem.addActionListener(ellipseActionListener);
         shapeGroup.add(ellipseItem);
+
         shapeMenu.add(rectangleItem);
         shapeMenu.add(ellipseItem);
 

@@ -16,12 +16,8 @@ public class NoFill implements FillBehavior {
         return copy;
     }
 
-
-
     public NoFill() {
     }
-
-
 
     @Override
     public void setColor(Color color) {
